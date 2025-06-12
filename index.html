@@ -3,25 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDoリスト</title>
+    <title>カンバン式ToDoアプリ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>ToDoリスト</h1>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>📋 カンバン式ToDoアプリ</h1>
+            <div class="header-controls">
+                <button id="theme-toggle" class="theme-toggle" title="ダークモード切り替え">🌗</button>
+                <button id="stats-toggle" class="stats-toggle" title="統計表示">📊</button>
+            </div>
         </header>
         
-        <div class="input-section">
-            <input type="text" id="task-input" placeholder="新しいタスクを入力" maxlength="100">
-            <button id="add-btn">追加</button>
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>タグ:</label>
+                <div id="tag-filters" class="tag-filters"></div>
+            </div>
+            <div class="filter-group">
+                <label>優先度:</label>
+                <div class="priority-filters">
+                    <button class="filter-btn priority-high" data-priority="high">高</button>
+                    <button class="filter-btn priority-medium" data-priority="medium">中</button>
+                    <button class="filter-btn priority-low" data-priority="low">低</button>
+                    <button class="filter-btn" data-priority="all">全て</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <input type="text" id="search-input" placeholder="タスク検索..." class="search-input">
+            </div>
         </div>
         
-        <ul id="task-list" class="task-list">
-        </ul>
+        <div class="task-input-section">
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-title" placeholder="タスクタイトル" required maxlength="100">
+                <textarea id="task-description" placeholder="説明（オプション）" rows="2" maxlength="500"></textarea>
+                <div class="form-row">
+                    <input type="date" id="task-due-date" class="due-date-input">
+                    <select id="task-priority" class="priority-select">
+                        <option value="low">低</option>
+                        <option value="medium" selected>中</option>
+                        <option value="high">高</option>
+                    </select>
+                    <input type="text" id="task-tags" placeholder="タグ（カンマ区切り）" class="tags-input">
+                </div>
+                <button type="submit" class="add-task-btn">📝 タスク追加</button>
+            </form>
+        </div>
         
-        <div class="counter">
-            <span id="task-counter">残り0件のタスクがあります</span>
+        <div class="kanban-board" id="kanban-board">
+            <div class="kanban-column" data-status="todo">
+                <div class="column-header">
+                    <h3>📝 未着手</h3>
+                    <span class="task-count" id="todo-count">0</span>
+                </div>
+                <div class="task-list" data-status="todo" id="todo-list"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="in_progress">
+                <div class="column-header">
+                    <h3>⚡ 進行中</h3>
+                    <span class="task-count" id="in_progress-count">0</span>
+                </div>
+                <div class="task-list" data-status="in_progress" id="in_progress-list"></div>
+            </div>
+            
+            <div class="kanban-column" data-status="done">
+                <div class="column-header">
+                    <h3>✅ 完了</h3>
+                    <span class="task-count" id="done-count">0</span>
+                </div>
+                <div class="task-list" data-status="done" id="done-list"></div>
+            </div>
+        </div>
+        
+        <div class="stats-panel" id="stats-panel" style="display: none;">
+            <h3>📊 統計</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-tasks">0</span>
+                    <span class="stat-label">総タスク数</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="completed-tasks">0</span>
+                    <span class="stat-label">完了タスク</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="completion-rate">0%</span>
+                    <span class="stat-label">完了率</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- タスク編集モーダル -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>タスク編集</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <form id="edit-form" class="edit-form">
+                <input type="hidden" id="edit-task-id">
+                <input type="text" id="edit-task-title" placeholder="タスクタイトル" required maxlength="100">
+                <textarea id="edit-task-description" placeholder="説明（オプション）" rows="3" maxlength="500"></textarea>
+                <div class="form-row">
+                    <input type="date" id="edit-task-due-date" class="due-date-input">
+                    <select id="edit-task-priority" class="priority-select">
+                        <option value="low">低</option>
+                        <option value="medium">中</option>
+                        <option value="high">高</option>
+                    </select>
+                    <input type="text" id="edit-task-tags" placeholder="タグ（カンマ区切り）" class="tags-input">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="save-btn">💾 保存</button>
+                    <button type="button" class="cancel-btn" id="cancel-edit">キャンセル</button>
+                </div>
+            </form>
         </div>
     </div>
     
